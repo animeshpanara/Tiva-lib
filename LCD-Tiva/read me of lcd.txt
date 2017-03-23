@@ -1,0 +1,105 @@
+                                                     LCD 16x2 JHD 162A
+
+LCD PIN OUT-
+
+1.VSS-connect it to GND
+2.VDD-connect it to 5V
+3.VEE-connect it to GND
+4.RS-connect it to Q4
+5.R/W-connect it to GND
+6.ENABLE-connect it to GPIO_PIN_0 (PORTB)
+D0,D1,D2,D3-no connection
+11.D4-connect it to Q0
+12.D5-connect it to Q1
+13.D6-connect it to Q2
+14.D7-connect it to Q3
+=====================================================================================================
+74HC595 PIN OUT-
+
+SH_CP and ST_CP-short both the pins and connect them through CLOCK pin (GPIO_PIN_5)(PORTB)
+DS-connect it to DATA pin(GPIO_PIN_1)(PORTB)
+MR-connect it to 5V
+OE-connect it to GND
+
+first connect ENABLE,CLOCK AND DATA pins to LLC then to tiva
+======================================================================================================
+and for further information refer this link -http://www.ly3ci.com/lcd_595.html
+====================================================================================================
+FUNCTIONING OF LCD->
+Pin description-
+Vss-GND 
+VDD-5V
+VEE-contrast pin-its voltage can be varied using potentiometer,bt we can also connect it to GND
+RS-register select pin
+this pin is used to give commands and data to the LCD
+RS=1 //data register
+RS=0 //command register
+R/W-read/write pin,used to read and write on LCD
+R/W=1//read from LCD
+R/W=0//write on LCD
+ENABLE= This is a edge triggering signal which is used while writing or reading data to/from LCD respectively.
+E = high to low / negative edge triggered -> Write
+E = low to high / positive edge triggered -> Read
+D0,D1,D2,D3,D4,D5,D6,D7-DATA PINS of LCD 
+D7-it is the busy flag pin of LCD.We have to configure D7 pin as input while checking the flag condition.And along with this we have to
+make RS=0 and R/W=1.Since this is the read operation and busy flag is given by command code register mode.
+Busy flag=1 =>LCD is busy
+Busy flag=0 =>LCD can take next data or command.
+15th and 16th pin of LCD ->backlight pins
+15th=Vcc and 16th=GND
+
+
+FEW BASIC COMMANDS OF LCD ->
+///// 4 pin initialization
+LcdCommandWrite(0x03); // function set:
+// 4 pin initialization
+delay(64);
+LcdCommandWrite(0x03); // function set:
+// 4 pin initialization
+delay(50);
+LcdCommandWrite(0x03); // function set:
+// 4 pin initialization
+delay(50);
+LcdCommandWrite(0x02); // function set:
+// 4 pin initialization
+delay(50);
+LcdCommandWrite(0x2C); // function set:
+// 4-bit interface, 1 display lines, 5x7 font
+////// end of 4 pin initialization 
+delay(20);
+LcdCommandWrite(0x06); // entry mode set:
+// increment automatically, no display shift
+delay(20);
+LcdCommandWrite(0x0E); // display control:
+// turn display on, cursor on, no blinking
+delay(20);
+LcdCommandWrite(0x01); // clear display, set cursor position to zero
+delay(100);
+LcdCommandWrite(0x80); // display control:(To start the cursor from beginning)
+delay(20);
+///// unter this line are the special stuff you don't need for a initialitzation
+LcdCommandWrite(0x0F); //  cursor blink
+delay(10);
+}
+
+
+========================================================================================================
+now brief description of the functions used in lcd library-
+1.void LCD_16x2_595_init()-this function set 3 pins-enable,clock and data as output pins and initially their value is zero
+
+2.void LCD_595_Init()-in this function,some commands are being sent to LCD like 0x03 for 4 pin initialization,etc
+
+3.void Lcd_595_Cmd(unsigned char c)-this function is used to send command to LCD .In this we are sending 8 bit data to
+ 4 data pins of LCD by diving the 8 bit data in 2 parts and assigning them to upper nibble and lower nibble.
+
+4.void Lcd_595_Chr_Cp(unsigned char c)-this function is used to send character to the LCD.
+
+5.void sendAstring(char *string_of_character)-this function is used to send string to LCD
+
+6.void PulseEnable ()-to enable the LCD
+
+7.void shiftOut(unsigned char c)-sending data bit wise.
+
+8.void sendAnumber(unsigned long n)-used to print number on LCD
+
+9.void send_to_next_line(char *ch)-used to print string on LCD in both lines
